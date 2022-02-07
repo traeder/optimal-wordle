@@ -1,7 +1,8 @@
 import json, random
 
 from flask import render_template, Blueprint, request
-from words import Letters, WordProbability, load_letter_frequencies, load_word_list
+from words import WordProbability, load_letter_frequencies, load_word_list
+from constraint import Constraints, LengthConstraint
 
 
 wordle = Blueprint('wordle', __name__, template_folder="templates")
@@ -26,9 +27,9 @@ def home():
 def optimal_guess():
     json_data = request.get_json(force=True)
     print(json_data)
-    letters = Letters.from_wordle(json_data)
-    print(letters.letters)
-    valid_words = letters.filter_word_list(word_list)
+    constraints = Constraints.from_wordle(json_data)
+    constraints.prepend(LengthConstraint(5))
+    valid_words = list(filter(constraints.apply, word_list))
     print(valid_words)
     best_words = wp.best_words_by_score(valid_words, 5)
     print(best_words)

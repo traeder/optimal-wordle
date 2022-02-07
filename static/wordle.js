@@ -1893,11 +1893,16 @@ function new_word() {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-      alert(this.responseText)
-        window.localStorage.gameState.solution = this.responseText
-        window.localStorage.gameState.boardState = ["", "", "", "", "", ""]
-        window.localStorage.gameState.evaluations = [null, null, null, null, null, null]
-        window.localStorage.gameState.
+          g = document.getElementsByTagName("game-app")[0]
+          g.solution = this.responseText.toLowerCase()
+          g.boardState = ['', '', '', '', '', '']
+          g.evaluations = [null, null, null, null, null, null]
+          g.rowIndex = 0
+          g.restoringFromLocalStorage = true
+          g.gameStatus = "IN_PROGRESS"
+          g.canInput = true
+          window.localStorage.setItem("gameState", JSON.stringify(g))
+          window.location.reload()
       }
     };
     xhr.open("GET", "/word", true)
