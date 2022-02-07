@@ -34,7 +34,7 @@ class TestWords(unittest.TestCase):
 
     def test_is_in_location(self):
         letters = Letters(5)
-        letters.mark_is_in_location('M', 3)
+        letters.mark_correct('M', 3)
         self.assertTrue(letters.is_valid_in_location('M', 3))
         for letter in letters.alphabet:
             if letter != 'M':
@@ -42,14 +42,14 @@ class TestWords(unittest.TestCase):
 
     def test_not_in_word(self):
         letters = Letters(5)
-        letters.mark_not_present('M')
+        letters.mark_absent('M')
         for location in range(5):
             self.assertFalse(letters.is_valid_in_location('M', 3))
 
     def test_is_valid(self):
         letters = Letters(5)
         self.assertTrue(letters.is_valid('IRATE'))
-        letters.mark_not_present('T')
+        letters.mark_absent('T')
         self.assertFalse(letters.is_valid('IRATE'))
 
     def test_best_by_score(self):
@@ -59,7 +59,7 @@ class TestWords(unittest.TestCase):
                        load_letter_frequencies("english_bigrams.txt"),
                        load_letter_frequencies("english_trigrams.txt")]
         wp = WordProbability(frequencies)
-        letters.mark_not_present('T')
+        letters.mark_absent('T')
         sublist = list(letters.filter_word_list(word_list))
         print(wp.best_words_by_score(sublist, 5))
         print(wp.best_words_by_probability(sublist, 5))

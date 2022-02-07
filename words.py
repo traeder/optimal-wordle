@@ -1,4 +1,4 @@
-import math, itertools
+import math, itertools, json
 
 
 class WordProbability:
@@ -49,16 +49,16 @@ class Letters:
         self.board_size = board_size
         self.letters = {l: self.max_val for l in self.alphabet}
 
-    def mark_not_present(self, letter):
+    def mark_absent(self, letter):
         self.letters[letter] = 0
 
     def mark_not_in_location(self, letter, location):
-        self.letters[letter] &= (self.max_val - 1 << location)
+        self.letters[letter] &= ~(1 << location)
 
-    def mark_is_in_location(self, letter, location):
+    def mark_correct(self, letter, location):
         for l in self.letters:
-            self.mark_not_in_location(l, location)
-        self.letters[letter] = 1 << location
+            if l != letter:
+                self.mark_not_in_location(l, location)
 
     def is_valid_in_location(self, letter, location):
         return bool(self.letters[letter] & (1 << location))
@@ -69,7 +69,38 @@ class Letters:
         return min(self.is_valid_in_location(word[i], i) for i in range(len(word)))
 
     def filter_word_list(self, word_list):
-        return filter(self.is_valid, word_list)
+        return list(filter(self.is_valid, word_list))
+
+    def to_json(self):
+        return json.dumps(self.__dict__)
+
+    @classmethod
+    def from_json(cls, s):
+        d = json.loads(s)
+        r = Letters(d['board_size'])
+        r.letters = d['letters']
+        return r
+
+    @classmethod
+    def from_wordle(cls, d):
+        board_state = d['boardState']
+        print(board_state)
+        letters = Letters(len(board_state[0]))
+        evaluations = d['evaluations']
+        print(evaluations)
+        for row, w in enumerate(board_state):
+            word = w.upper()
+            if len(word) == 0:
+                return letters
+            for ix, evaluation in enumerate(evaluations[row]):
+                letter = word[ix]
+                if evaluation == 'absent':
+                    letters.mark_absent(letter)
+                elif evaluation == 'correct':
+                    letters.mark_correct(letter, ix)
+                elif evaluation == 'present':
+                    letters.mark_not_in_location(letter, ix)
+        return letters
 
 
 def load_letter_frequencies(file, sep=' '):
