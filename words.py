@@ -82,10 +82,12 @@ class Letters:
         return r
 
     @classmethod
-    def from_wordle(cls, d):
+    def from_wordle(cls, input_data):
+        d = json.loads(input_data) if isinstance(input_data, str) else input_data
         board_state = d['boardState']
         print(board_state)
-        letters = Letters(len(board_state[0]))
+        board_size = len(board_state[0]) or 5
+        letters = Letters(board_size)
         evaluations = d['evaluations']
         print(evaluations)
         for row, w in enumerate(board_state):

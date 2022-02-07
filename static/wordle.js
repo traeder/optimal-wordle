@@ -1876,3 +1876,30 @@ this.wordle = this.wordle || {}, this.wordle.bundle = function(e) {
         value: !0
     }), e
 }({});
+
+function recommend() {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (this.readyState == 4) {
+        alert(this.responseText);
+      }
+    };
+    xhr.open("POST", "/guess", true)
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.send(JSON.stringify(window.localStorage.gameState))
+}
+
+function new_word() {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+      alert(this.responseText)
+        window.localStorage.gameState.solution = this.responseText
+        window.localStorage.gameState.boardState = ["", "", "", "", "", ""]
+        window.localStorage.gameState.evaluations = [null, null, null, null, null, null]
+        window.localStorage.gameState.
+      }
+    };
+    xhr.open("GET", "/word", true)
+    xhr.send()
+}

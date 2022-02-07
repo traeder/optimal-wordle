@@ -1,4 +1,4 @@
-import json
+import json, random
 
 from flask import render_template, Blueprint, request
 from words import Letters, WordProbability, load_letter_frequencies, load_word_list
@@ -25,6 +25,7 @@ def home():
 @wordle.route('/guess', methods=['POST'])
 def optimal_guess():
     json_data = request.get_json(force=True)
+    print(json_data)
     letters = Letters.from_wordle(json_data)
     print(letters.letters)
     valid_words = letters.filter_word_list(word_list)
@@ -32,3 +33,12 @@ def optimal_guess():
     best_words = wp.best_words_by_score(valid_words, 5)
     print(best_words)
     return json.dumps(best_words)
+
+@wordle.route('/word', methods=['GET'])
+@wordle.route('/word/<seed>', methods=['GET'])
+def word(seed=None):
+    subwords = [w for w in word_list if len(w) == 5]
+    if seed is not None:
+        random.seed(seed)
+    ix = random.randint(0, len(subwords))
+    return subwords[ix]
